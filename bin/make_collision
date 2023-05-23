@@ -1,0 +1,13 @@
+import argparse
+from iccr.iccr import Collision
+
+def main(file_in):
+    a = initialcondition(file_in)
+    print(a)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("file_name", help="Data file.")
+
+    args = parser.parse_args()
+    main(file_in=args.file_name)
