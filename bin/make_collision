@@ -1,15 +1,15 @@
 import argparse
 from iccr.iccr import Collision
 
-def main(file_name, galaxy1, galaxy2):
-    a = Collision.initialcondition(file_name, galaxy1, galaxy2)
+def main(galaxy1, galaxy2):
+    a = Collision().initial_condition_file(galaxy1, galaxy2)
     print(a)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("file_name", help="Data file.")
+    #parser.add_argument("file_name", help="Data file.")
     parser.add_argument("galaxy1_name", help="Data file.")
     parser.add_argument("galaxy2_name", help="Data file.")
 
     args = parser.parse_args()
-    main(args.file_name, args.galaxy1_name, args.galaxy2_name)
+    main(args.galaxy1_name, args.galaxy2_name)
