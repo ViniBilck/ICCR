@@ -24,7 +24,6 @@ class Collision:
             ax = - mg * x / np.linalg.norm([x, y, z]) ** 3
             ay = - mg * y / np.linalg.norm([x, y, z]) ** 3
             az = - mg * z / np.linalg.norm([x, y, z]) ** 3
-
             return [vx, vy, vz, ax, ay, az]
 
         if escape_velocity is None:
@@ -51,6 +50,15 @@ class Collision:
                      "Velocities_G1": initial_veloc_g1,
                      "Velocities_G2": initial_veloc_g2}
         return all_datas
+
+    @staticmethod
+    def get_particles(galaxyfile1, galaxyfile2):
+        with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
+            total_part_1 = getattr(galaxy1.root.Header, "_v_attrs").NumPart_ThisFile[:]
+            total_part_2 = getattr(galaxy2.root.Header, "_v_attrs").NumPart_ThisFile[:]
+            total_quantity = total_part_1 + total_part_2
+            total = [sum(total_quantity[0:i]) for i in range(6)]
+            return total
 
     def initial_condition_file(self, galaxyfile1, galaxyfile2):
         with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
