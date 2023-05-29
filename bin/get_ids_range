@@ -1,0 +1,14 @@
+import argparse
+from iccr.iccr import Collision
+
+def main(m1, m2):
+    a = Collision().get_particles(m1, m2)
+    print(a)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("mass1", help="Data file.")
+    parser.add_argument("mass2", help="Data file.")
+
+    args = parser.parse_args()
+    main(args.mass1, args.mass2)

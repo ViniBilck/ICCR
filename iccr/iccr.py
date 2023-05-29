@@ -6,7 +6,9 @@ G_CONST_KPC = 44985
 
 
 class Collision:
-    def __init__(self):
+    def __init__(self, galaxyname1, galaxyname2):
+        self.galaxyname1 = galaxyname1
+        self.galaxyname2 = galaxyname2
         self.parttypes_in_hdf5 = "PartType0,PartType1,PartType2,PartType3,PartType4,PartType5".split(",")
         self.properties_in_hdf5 = "Coordinates,Velocities,ParticleIDs,Masses,InternalEnergy,Density,SmoothingLength," \
                                   "Potential,Acceleration".split(",")
@@ -24,7 +26,6 @@ class Collision:
             ax = - mg * x / np.linalg.norm([x, y, z]) ** 3
             ay = - mg * y / np.linalg.norm([x, y, z]) ** 3
             az = - mg * z / np.linalg.norm([x, y, z]) ** 3
-
             return [vx, vy, vz, ax, ay, az]
 
         if escape_velocity is None:
@@ -52,7 +53,18 @@ class Collision:
                      "Velocities_G2": initial_veloc_g2}
         return all_datas
 
-    def initial_condition_file(self, galaxyfile1, galaxyfile2):
+    @staticmethod
+    def get_particles(galaxyfile1, galaxyfile2):
+        with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
+            total_part_1 = getattr(galaxy1.root.Header, "_v_attrs").NumPart_ThisFile[:]
+            total_part_2 = getattr(galaxy2.root.Header, "_v_attrs").NumPart_ThisFile[:]
+            total_quantity = total_part_1 + total_part_2
+            total = [sum(total_quantity[0:i]) for i in range(6)]
+            return total
+
+    def initial_condition_file(self):
+        galaxyfile1 = self.galaxyname1
+        galaxyfile2 = self.galaxyname2
         with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
             for all_types in self.parttypes_in_hdf5:
                 for all_properties in self.properties_in_hdf5:
