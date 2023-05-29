@@ -6,7 +6,9 @@ G_CONST_KPC = 44985
 
 
 class Collision:
-    def __init__(self):
+    def __init__(self, galaxyname1, galaxyname2):
+        self.galaxyname1 = galaxyname1
+        self.galaxyname2 = galaxyname2
         self.parttypes_in_hdf5 = "PartType0,PartType1,PartType2,PartType3,PartType4,PartType5".split(",")
         self.properties_in_hdf5 = "Coordinates,Velocities,ParticleIDs,Masses,InternalEnergy,Density,SmoothingLength," \
                                   "Potential,Acceleration".split(",")
@@ -60,7 +62,9 @@ class Collision:
             total = [sum(total_quantity[0:i]) for i in range(6)]
             return total
 
-    def initial_condition_file(self, galaxyfile1, galaxyfile2):
+    def initial_condition_file(self):
+        galaxyfile1 = self.galaxyname1
+        galaxyfile2 = self.galaxyname2
         with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
             for all_types in self.parttypes_in_hdf5:
                 for all_properties in self.properties_in_hdf5:

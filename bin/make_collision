@@ -2,7 +2,7 @@ import argparse
 from iccr.iccr import Collision
 
 def main(galaxy1, galaxy2):
-    a = Collision().initial_condition_file(galaxy1, galaxy2)
+    a = Collision(galaxy1, galaxy2).initial_condition_file()
     print(a)
 
 if __name__ == '__main__':
