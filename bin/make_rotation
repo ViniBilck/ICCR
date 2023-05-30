@@ -1,0 +1,16 @@
+import argparse
+from iccr.iccr import Collision
+
+def main(name1, name2, gal, angle):
+    a = Collision(name1, name2).do_rotation(gal, angle)
+    print(a)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("name1", help="Data file.")
+    parser.add_argument("name2", help="Data file.")
+    parser.add_argument("gal", type = int, help="Data file.")
+    parser.add_argument("--angles", nargs = '+', type = float, help="Data file.")
+
+    args = parser.parse_args()
+    main(args.name1, args.name2, args.gal, args.angles)

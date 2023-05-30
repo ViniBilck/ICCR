@@ -2,7 +2,7 @@ import argparse
 from iccr.iccr import Collision
 
 def main(m1, m2):
-    a = Collision().get_particles(m1, m2)
+    a = Collision("any", "any").get_particles(m1, m2)
     print(a)
 
 if __name__ == '__main__':
