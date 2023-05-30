@@ -1,12 +1,13 @@
 import numpy as np
 import tables
 from scipy import integrate
+from scipy.spatial.transform import Rotation
 
 G_CONST_KPC = 44985
 
 
 class Collision:
-    def __init__(self, galaxyname1, galaxyname2):
+    def __init__(self, galaxyname1: str, galaxyname2: str):
         self.galaxyname1 = galaxyname1
         self.galaxyname2 = galaxyname2
         self.parttypes_in_hdf5 = "PartType0,PartType1,PartType2,PartType3,PartType4,PartType5".split(",")
@@ -53,19 +54,43 @@ class Collision:
                      "Velocities_G2": initial_veloc_g2}
         return all_datas
 
-    @staticmethod
-    def get_particles(galaxyfile1, galaxyfile2):
-        with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
+    def get_particles(self):
+        with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
             total_part_1 = getattr(galaxy1.root.Header, "_v_attrs").NumPart_ThisFile[:]
             total_part_2 = getattr(galaxy2.root.Header, "_v_attrs").NumPart_ThisFile[:]
             total_quantity = total_part_1 + total_part_2
             total = [sum(total_quantity[0:i]) for i in range(6)]
             return total
 
+    def do_rotation(self, which_galaxy: int, angles: list):
+        rotation_matrix = Rotation.from_euler('xyz', angles, degrees=True).as_matrix()
+        if which_galaxy == 0:
+            with tables.open_file(self.galaxyname1, "a") as galaxy1:
+                for all_types in self.parttypes_in_hdf5:
+                    try:
+                        old_coords = getattr(galaxy1.root, f"{all_types}").Coordinates[:]
+                        new_coords = np.matmul(old_coords, rotation_matrix)
+                        old_veloci = getattr(galaxy1.root, f"{all_types}").Velocities[:]
+                        new_veloci = np.matmul(old_veloci, rotation_matrix)
+                        getattr(galaxy1.root, f"{all_types}").Coordinates[:] = new_coords
+                        getattr(galaxy1.root, f"{all_types}").Velocities[:] = new_veloci
+                    except ValueError:
+                        print(f"There is no Coordinates or Velocities in {all_types}")
+        if which_galaxy == 1:
+            with tables.open_file(self.galaxyname2, "a") as galaxy2:
+                for all_types in self.parttypes_in_hdf5:
+                    try:
+                        old_coords = getattr(galaxy2.root, f"{all_types}").Coordinates[:]
+                        new_coords = np.matmul(old_coords, rotation_matrix)
+                        old_veloci = getattr(galaxy2.root, f"{all_types}").Velocities[:]
+                        new_veloci = np.matmul(old_veloci, rotation_matrix)
+                        getattr(galaxy2.root, f"{all_types}").Coordinates[:] = new_coords
+                        getattr(galaxy2.root, f"{all_types}").Velocities[:] = new_veloci
+                    except ValueError:
+                        print(f"There is no Coordinates or Velocities in {all_types}")
+
     def initial_condition_file(self):
-        galaxyfile1 = self.galaxyname1
-        galaxyfile2 = self.galaxyname2
-        with tables.open_file(galaxyfile1, "r") as galaxy1, tables.open_file(galaxyfile2, "r") as galaxy2:
+        with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
             for all_types in self.parttypes_in_hdf5:
                 for all_properties in self.properties_in_hdf5:
                     print("Gal1", getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}"))

@@ -12,7 +12,7 @@ setup(
     version="0.1",
     packages=['iccr'],
     package_data=package_data,
-    scripts=['bin/make_collision', 'bin/make_orbit', 'bin/get_ids_range'],
+    scripts=['bin/make_collision', 'bin/make_orbit', 'bin/get_ids_range', 'bin/make_rotation'],
     description="Initial Condition to Collision Route",
     author="Vinicius Lourival Bilck",
     author_email="bilck.vinicius1998@gmail.com",

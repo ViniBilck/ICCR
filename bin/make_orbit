@@ -2,7 +2,7 @@ import argparse
 from iccr.iccr import Collision
 
 def main(m1, m2, pericenter):
-    a = Collision().initial_orbit(float(m1), float(m2), float(pericenter))
+    a = Collision("any", "any").initial_orbit(float(m1), float(m2), float(pericenter))
     for key in a:
         print(key, ":", a[key])
 
