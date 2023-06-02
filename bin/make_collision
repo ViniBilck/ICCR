@@ -1,8 +1,8 @@
 import argparse
 from iccr.iccr import Collision
 
-def main(galaxy1, galaxy2):
-    a = Collision(galaxy1, galaxy2).initial_condition_file()
+def main(galaxy1, galaxy2, pericenter):
+    a = Collision(galaxy1, galaxy2).initial_condition_file(pericenter = pericenter)
     print(a)
 
 if __name__ == '__main__':
@@ -10,6 +10,7 @@ if __name__ == '__main__':
     #parser.add_argument("file_name", help="Data file.")
     parser.add_argument("galaxy1_name", help="Data file.")
     parser.add_argument("galaxy2_name", help="Data file.")
+    parser.add_argument("pericenter", type = float, help="Data file.")
 
     args = parser.parse_args()
-    main(args.galaxy1_name, args.galaxy2_name)
+    main(args.galaxy1_name, args.galaxy2_name, args.pericenter)
