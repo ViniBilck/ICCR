@@ -54,13 +54,27 @@ class Collision:
                      "Velocities_G2": initial_veloc_g2}
         return all_datas
 
+    def get_mass(self):
+        with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
+            galaxy1_mass_total = 0
+            galaxy2_mass_total = 0
+            for all_types in self.parttypes_in_hdf5:
+                try:
+                    galaxy1_mass = sum(getattr(galaxy1.root, f"{all_types}").Masses[:])
+                    galaxy2_mass = sum(getattr(galaxy2.root, f"{all_types}").Masses[:])
+                    galaxy1_mass_total = galaxy1_mass_total + galaxy1_mass
+                    galaxy2_mass_total = galaxy2_mass_total + galaxy2_mass
+                except ValueError:
+                    print(f"There is no Masses in {all_types}")
+        return [galaxy1_mass_total, galaxy2_mass_total]
+
     def get_particles(self):
         with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
             total_part_1 = getattr(galaxy1.root.Header, "_v_attrs").NumPart_ThisFile[:]
             total_part_2 = getattr(galaxy2.root.Header, "_v_attrs").NumPart_ThisFile[:]
             total_quantity = total_part_1 + total_part_2
             total = [sum(total_quantity[0:i]) for i in range(6)]
-            return total
+        return total
 
     def do_rotation(self, which_galaxy: int, angles: list):
         rotation_matrix = Rotation.from_euler('xyz', angles, degrees=True).as_matrix()
@@ -89,9 +103,11 @@ class Collision:
                     except ValueError:
                         print(f"There is no Coordinates or Velocities in {all_types}")
 
-    def initial_condition_file(self):
+    def initial_condition_file(self, pericenter, escape_velocity=None):
+        galaxies_masses = self.get_mass()
+        initial_orbits = self.initial_orbit(galaxies_masses[0], galaxies_masses[0], pericenter, escape_velocity)
         with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
             for all_types in self.parttypes_in_hdf5:
                 for all_properties in self.properties_in_hdf5:
-                    print("Gal1", getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}"))
-                    print("Gal2", getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}"))
+                    if all_properties == "Coordinates":
+                        print("Gal1", getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:])
