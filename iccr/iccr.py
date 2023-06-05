@@ -111,8 +111,11 @@ class Collision:
         galaxies_masses = self.get_mass()
         initial_orbits = self.initial_orbit(galaxies_masses[0], galaxies_masses[0], pericenter, escape_velocity)
         all_particleids = self.get_particles()
+        numpart = self.get_numparts()
         with tables.open_file("collision_file", "w") as collision_file:
             collision_file.create_group("/", "Header")
+            getattr(collision_file.root.Header, "_v_attrs").NumPart_ThisFile = numpart
+            getattr(collision_file.root.Header, "_v_attrs").NumPart_Total = numpart
             getattr(collision_file.root.Header, "_v_attrs").MassTable = np.array([0, 0, 0, 0, 0, 0])
             getattr(collision_file.root.Header, "_v_attrs").Time = 1.
             getattr(collision_file.root.Header, "_v_attrs").Redshift = 0.
