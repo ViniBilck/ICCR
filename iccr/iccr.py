@@ -69,15 +69,19 @@ class Collision:
         return [galaxy1_mass_total, galaxy2_mass_total]
 
     def get_particles(self):
+        total_quantity = self.get_numparts()
+        total = [sum(total_quantity[0:i]) for i in range(6)]
+        return total
+
+    def get_numparts(self):
         with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
             total_part_1 = getattr(galaxy1.root.Header, "_v_attrs").NumPart_ThisFile[:]
             total_part_2 = getattr(galaxy2.root.Header, "_v_attrs").NumPart_ThisFile[:]
             total_quantity = total_part_1 + total_part_2
-            total = [sum(total_quantity[0:i]) for i in range(6)]
-        return total
+        return total_quantity
 
-    def do_rotation(self, which_galaxy: int, angles: list):
-        rotation_matrix = Rotation.from_euler('xyz', angles, degrees=True).as_matrix()
+    def do_rotation(self, which_galaxy: int, rotation_sequence: str, angles: list):
+        rotation_matrix = Rotation.from_euler(rotation_sequence, angles, degrees=True).as_matrix()
         if which_galaxy == 0:
             with tables.open_file(self.galaxyname1, "a") as galaxy1:
                 for all_types in self.parttypes_in_hdf5:
@@ -106,8 +110,49 @@ class Collision:
     def initial_condition_file(self, pericenter, escape_velocity=None):
         galaxies_masses = self.get_mass()
         initial_orbits = self.initial_orbit(galaxies_masses[0], galaxies_masses[0], pericenter, escape_velocity)
-        with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
-            for all_types in self.parttypes_in_hdf5:
-                for all_properties in self.properties_in_hdf5:
-                    if all_properties == "Coordinates":
-                        print("Gal1", getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:])
+        all_particleids = self.get_particles()
+        numpart = self.get_numparts()
+        with tables.open_file("collision_file", "w") as collision_file:
+            collision_file.create_group("/", "Header")
+            getattr(collision_file.root.Header, "_v_attrs").NumPart_ThisFile = numpart
+            getattr(collision_file.root.Header, "_v_attrs").NumPart_Total = numpart
+            getattr(collision_file.root.Header, "_v_attrs").MassTable = np.array([0, 0, 0, 0, 0, 0])
+            getattr(collision_file.root.Header, "_v_attrs").Time = 1.
+            getattr(collision_file.root.Header, "_v_attrs").Redshift = 0.
+            getattr(collision_file.root.Header, "_v_attrs").BoxSize = 35000.
+            getattr(collision_file.root.Header, "_v_attrs").HubbleParam = 0.6774
+            getattr(collision_file.root.Header, "_v_attrs").Omega0 = 0.3089
+            getattr(collision_file.root.Header, "_v_attrs").OmegaBaryon = 0.0486
+            getattr(collision_file.root.Header, "_v_attrs").OmegaLambda = 0.6911
+            getattr(collision_file.root.Header, "_v_attrs").NumFilesPerSnapshot = 1
+            with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
+                for all_types in self.parttypes_in_hdf5:
+                    particle_count = 0
+                    collision_file.create_group("/", f"{all_types}")
+                    for all_properties in self.properties_in_hdf5:
+                        if all_properties == "Velocities":
+                            galaxy1_vector = getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:]
+                            galaxy2_vector = getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}")[:]
+                            galaxy1_vector_new = galaxy1_vector + initial_orbits["Velocities_G1"]
+                            galaxy2_vector_new = galaxy2_vector + initial_orbits["Velocities_G2"]
+                            properties_vector = np.append(galaxy1_vector_new, galaxy2_vector_new, axis=0)
+                            collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
+                                                        f"{all_properties}", properties_vector)
+                        elif all_properties == "Coordinates":
+                            galaxy1_vector = getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:]
+                            galaxy2_vector = getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}")[:]
+                            galaxy1_vector_new = galaxy1_vector + initial_orbits["Coord_G1"]
+                            galaxy2_vector_new = galaxy2_vector + initial_orbits["Coord_G2"]
+                            properties_vector = np.append(galaxy1_vector_new, galaxy2_vector_new, axis=0)
+                            collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
+                                                        f"{all_properties}", properties_vector)
+                        elif all_properties == "ParticleIDs":
+                            newids = np.arange(all_particleids[particle_count], all_particleids[particle_count+1], 1)
+                            collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
+                                                        f"{all_properties}", newids)
+                        else:
+                            galaxy1_vector = getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:]
+                            galaxy2_vector = getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}")[:]
+                            properties_vector = np.append(galaxy1_vector, galaxy2_vector, axis=0)
+                            collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
+                                                        f"{all_properties}", properties_vector)

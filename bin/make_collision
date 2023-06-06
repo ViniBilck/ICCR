@@ -3,7 +3,7 @@ from iccr.iccr import Collision
 
 def main(galaxy1, galaxy2, pericenter):
     a = Collision(galaxy1, galaxy2).initial_condition_file(pericenter = pericenter)
-    print(a)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
