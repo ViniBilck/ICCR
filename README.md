@@ -1,4 +1,4 @@
-# ICCR
+# ICCR - Initial Configuration to Collision Route
 
 This README provides an overview of the `iccr.py` code, which is designed to perform calculations related to galaxy collisions. The code is written in Python and requires the following dependencies: `numpy`, `tables`, and `scipy`.
 
