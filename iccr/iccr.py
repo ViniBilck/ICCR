@@ -46,8 +46,8 @@ class Collision:
         v2 = -(m1 / (m1 + m2)) * v
         initial_coord_g1 = [r1[0][-1], r1[1][-1], r1[2][-1]]
         initial_coord_g2 = [r2[0][-1], r2[1][-1], r2[2][-1]]
-        initial_veloc_g1 = [v1[0][-1], v1[1][-1], v1[2][-1]]
-        initial_veloc_g2 = [v2[0][-1], v2[1][-1], v2[2][-1]]
+        initial_veloc_g1 = [-1 * v1[0][-1], -1 * v1[1][-1], -1 * v1[2][-1]]
+        initial_veloc_g2 = [-1 * v2[0][-1], -1 * v2[1][-1], -1 * v2[2][-1]]
         all_datas = {"Coord_G1": initial_coord_g1,
                      "Coord_G2": initial_coord_g2,
                      "Velocities_G1": initial_veloc_g1,
