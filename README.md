@@ -4,6 +4,8 @@ This README provides an overview of the `iccr.py` code, which is designed to per
 
 ## Table of Contents
 - [Introduction](#introduction)
+- [Requirements](#requirements)
+- [Installation](#installation)
 - [Class: Collision](#class-collision)
 - [Methods](#methods)
   - [initial_orbit](#initial_orbit)
@@ -15,6 +17,18 @@ This README provides an overview of the `iccr.py` code, which is designed to per
 
 ## Introduction
 The `iccr.py` code provides functionality to analyze and simulate galaxy collisions. It calculates initial orbits, retrieves mass information, manages particle data, performs rotations, and generates initial condition files for further simulations.
+
+## Requirements
+To run this package you will need this python libs.
+1. `pip install numpy`
+2. `pip install tables`
+3. `pip install scipy`
+
+## Installation
+1. Clone the repository
+2. If you use a conda virtual environment: `conda activate "your env name"`
+3. Enter `cd ICCR/` directory
+4. Then use `pip install -e .`
 
 ## Class: Collision
 The `Collision` class represents a galaxy collision and provides methods to perform various calculations and operations on the galaxy data.
