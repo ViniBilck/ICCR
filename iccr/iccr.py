@@ -111,10 +111,11 @@ class Collision:
         galaxies_masses = self.get_mass()
         if orbit is None:
             initial_orbits = self.initial_orbit(galaxies_masses[0], galaxies_masses[1], pericenter, escape_velocity)
-        initial_orbits = {"Coord_G1": orbit[0],                                                                                                  
-                          "Coord_G2": orbit[1],
-                          "Velocities_G1": orbit[2],
-                          "Velocities_G2": orbit[3]}
+        else:
+            initial_orbits = {"Coord_G1": orbit[0],                                                                                                  
+                              "Coord_G2": orbit[1],
+                              "Velocities_G1": orbit[2],
+                              "Velocities_G2": orbit[3]}
         all_particleids = self.get_particles()
         numpart = self.get_numparts()
         with tables.open_file("collision_file", "w") as collision_file:
