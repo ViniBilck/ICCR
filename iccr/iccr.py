@@ -70,7 +70,7 @@ class Collision:
 
     def get_particles(self):
         total_quantity = self.get_numparts()
-        total = [sum(total_quantity[0:i]) for i in range(6)]
+        total = [sum(total_quantity[0:i]) for i in range(7)]
         return total
 
     def get_numparts(self):
@@ -112,13 +112,13 @@ class Collision:
         if orbit is None:
             initial_orbits = self.initial_orbit(galaxies_masses[0], galaxies_masses[1], pericenter, escape_velocity)
         else:
-            initial_orbits = {"Coord_G1": orbit[0],                                                                                                  
-                              "Coord_G2": orbit[1],
+            initial_orbits = {"Coord_G1": orbit[0],                                                                                                  "Coord_G2": orbit[1],
                               "Velocities_G1": orbit[2],
                               "Velocities_G2": orbit[3]}
         all_particleids = self.get_particles()
         numpart = self.get_numparts()
-        with tables.open_file("collision_file", "w") as collision_file:
+        print(f"ParticleIDs Array is {all_particleids}")
+        with tables.open_file("collision_file.hdf5", "w") as collision_file:
             collision_file.create_group("/", "Header")
             getattr(collision_file.root.Header, "_v_attrs").NumPart_ThisFile = numpart
             getattr(collision_file.root.Header, "_v_attrs").NumPart_Total = numpart
@@ -132,8 +132,8 @@ class Collision:
             getattr(collision_file.root.Header, "_v_attrs").OmegaLambda = 0.6911
             getattr(collision_file.root.Header, "_v_attrs").NumFilesPerSnapshot = 1
             with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
+                particle_count = 0
                 for all_types in self.parttypes_in_hdf5:
-                    particle_count = 0
                     collision_file.create_group("/", f"{all_types}")
                     for all_properties in self.properties_in_hdf5:
                         if all_properties == "Velocities":
@@ -156,6 +156,8 @@ class Collision:
                             newids = np.arange(all_particleids[particle_count], all_particleids[particle_count+1], 1)
                             collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
                                                         f"{all_properties}", newids)
+                            particle_count = particle_count + 1
+                            print(particle_count) 
                         else:
                             galaxy1_vector = getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:]
                             galaxy2_vector = getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}")[:]
