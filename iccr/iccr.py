@@ -124,7 +124,7 @@ class Collision:
             getattr(collision_file.root.Header, "_v_attrs").NumPart_ThisFile = numpart
             getattr(collision_file.root.Header, "_v_attrs").NumPart_Total = numpart
             getattr(collision_file.root.Header, "_v_attrs").MassTable = np.array([0, 0, 0, 0, 0, 0])
-            getattr(collision_file.root.Header, "_v_attrs").Time = 1.
+            getattr(collision_file.root.Header, "_v_attrs").Time = 0.
             getattr(collision_file.root.Header, "_v_attrs").Redshift = 0.
             getattr(collision_file.root.Header, "_v_attrs").BoxSize = 35000.
             getattr(collision_file.root.Header, "_v_attrs").HubbleParam = 0.6774
