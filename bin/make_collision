@@ -1,16 +1,15 @@
 import argparse
-from iccr.iccr import Collision
+from iccr import Collision  # Adjust the import based on your package structure
 
 def main(galaxy1, galaxy2, pericenter):
-    a = Collision(galaxy1, galaxy2).initial_condition_file(pericenter = pericenter)
-
+    a = Collision(galaxy1, galaxy2).initial_condition_file(pericenter=pericenter)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    #parser.add_argument("file_name", help="Data file.")
-    parser.add_argument("galaxy1_name", help="Data file.")
-    parser.add_argument("galaxy2_name", help="Data file.")
-    parser.add_argument("pericenter", type = float, help="Data file.")
+    parser.add_argument("galaxy1_name", help="Name of the first galaxy.")
+    parser.add_argument("galaxy2_name", help="Name of the second galaxy.")
+    parser.add_argument("pericenter", type=float, help="Pericenter distance.")
 
     args = parser.parse_args()
     main(args.galaxy1_name, args.galaxy2_name, args.pericenter)
+

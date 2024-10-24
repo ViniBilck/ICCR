@@ -1,5 +1,5 @@
 import argparse
-from iccr.iccr import Collision
+from iccr import Collision
 
 def main(name1, name2, gal, sequence, angle):
     a = Collision(name1, name2).do_rotation(gal, sequence, angle)
