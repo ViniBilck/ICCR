@@ -1,5 +1,5 @@
 import argparse
-from iccr.iccr import Collision
+from iccr import Collision
 
 def main(m1, m2):
     a = Collision("any", "any").get_particles(m1, m2)
