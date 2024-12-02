@@ -1,4 +1,22 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "iccr"
+version = "0.1.0"
+description = "A library for handling collisions"
+authors = [
+    { name = "Vinicius Bilck"}
+]
+license = { text = "MIT" }
+dependencies = [
+    "numpy>=1.24.3",
+    "tables>=3.8.0",
+    "scipy>=1.10.1",
+    "argparse>=1.4.0"
+]
+
+[project.scripts]
+make_collision = "iccr.bin.make_collision:main"
+make_rotation = "iccr.bin.make_rotation:main"

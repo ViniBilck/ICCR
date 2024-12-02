@@ -10,9 +10,11 @@ class Collision:
     def __init__(self, galaxyname1: str, galaxyname2: str):
         self.galaxyname1 = galaxyname1
         self.galaxyname2 = galaxyname2
-        self.parttypes_in_hdf5 = "PartType0,PartType1,PartType2,PartType3,PartType4,PartType5".split(",")
-        self.properties_in_hdf5 = "Coordinates,Velocities,ParticleIDs,Masses,InternalEnergy,Density,SmoothingLength," \
-                                  "Potential,Acceleration".split(",")
+        self.parttypes_in_hdf5 = np.array(["PartType0,PartType1,PartType2,PartType3,PartType4,PartType5".split(",")])[0]
+        self.properties_in_hdf5 = np.array(["Coordinates,Velocities,ParticleIDs,Masses,InternalEnergy,Density,"
+                                            "SmoothingLength,"
+                                            "Potential,Acceleration".split(",")])[0]
+        self.verify_parts()
 
     @staticmethod
     def initial_orbit(m1, m2, pericenter, escape_velocity=None):
@@ -53,6 +55,32 @@ class Collision:
                      "Velocities_G1": initial_veloc_g1,
                      "Velocities_G2": initial_veloc_g2}
         return all_datas
+
+    def verify_parts(self):
+        with tables.open_file(self.galaxyname1, "r") as galaxy1:
+            part_mask = []
+            for all_types in self.parttypes_in_hdf5:
+                value1 = getattr(galaxy1.root, f"{all_types}", None)
+                if value1 is not None:
+                    print(f"Attribute '{all_types}' exists in Galaxy1")
+                    part_mask.append(True)
+                else:
+                    print(f"Attribute '{all_types}' does not exist in Galaxy1.")
+                    part_mask.append(False)
+            self.parttypes_in_hdf5 = self.parttypes_in_hdf5[part_mask]
+
+    def verify_prop(self, galaxy1, parttype):
+        prop_mask = []
+        for all_props in self.properties_in_hdf5:
+            value1 = getattr(galaxy1.root, f"{parttype}")
+            value2 = getattr(value1, f"{all_props}", None)
+            if value2 is not None:
+                print(f"Attribute '{all_props}' exists in Galaxy1 {parttype}")
+                prop_mask.append(True)
+            else:
+                print(f"Attribute '{all_props}' does not exist in Galaxy1 {parttype}.")
+                prop_mask.append(False)
+        return prop_mask
 
     def get_mass(self):
         with tables.open_file(self.galaxyname1, "r") as galaxy1, tables.open_file(self.galaxyname2, "r") as galaxy2:
@@ -136,7 +164,8 @@ class Collision:
                 particle_count = 0
                 for all_types in self.parttypes_in_hdf5:
                     collision_file.create_group("/", f"{all_types}")
-                    for all_properties in self.properties_in_hdf5:
+                    prop_mask = self.verify_prop(galaxy1, all_types)
+                    for all_properties in self.properties_in_hdf5[prop_mask]:
                         if all_properties == "Velocities":
                             galaxy1_vector = getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:]
                             galaxy2_vector = getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}")[:]
@@ -154,11 +183,11 @@ class Collision:
                             collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
                                                         f"{all_properties}", properties_vector)
                         elif all_properties == "ParticleIDs":
-                            newids = np.arange(all_particleids[particle_count], all_particleids[particle_count+1], 1)
+                            newids = np.arange(all_particleids[particle_count], all_particleids[particle_count + 1], 1)
                             collision_file.create_array(getattr(collision_file.root, f"{all_types}"),
                                                         f"{all_properties}", newids)
                             particle_count = particle_count + 1
-                            print(particle_count) 
+                            print(particle_count)
                         else:
                             galaxy1_vector = getattr(getattr(galaxy1.root, f"{all_types}"), f"{all_properties}")[:]
                             galaxy2_vector = getattr(getattr(galaxy2.root, f"{all_types}"), f"{all_properties}")[:]
