@@ -24,6 +24,11 @@ The `iccr.py` code provides functionality to analyze and simulate galaxy collisi
 3. Enter `cd ICCR/` directory
 4. Then use `pip install -e .`
 
+## Tutorial
+1. Edit example/config.ini to your config
+2. Go to: `cd example/`
+3. Run in terminal: `collision config.ini`
+
 ## Class: Collision
 The `Collision` class represents a galaxy collision and provides methods to perform various calculations and operations on the galaxy data.
 
