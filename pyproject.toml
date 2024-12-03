@@ -20,3 +20,4 @@ dependencies = [
 [project.scripts]
 make_collision = "iccr.bin.make_collision:main"
 make_rotation = "iccr.bin.make_rotation:main"
+collision = "iccr.bin.collision:main"
