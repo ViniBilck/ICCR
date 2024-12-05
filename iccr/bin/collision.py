@@ -1,8 +1,6 @@
 import configparser
 import argparse
-import numpy as np
-
-from iccr import Collision  # Adjust the import based on your package structure
+from iccr import Collision
 
 
 def main():
@@ -31,8 +29,10 @@ def main():
                           [config['Galaxy-2.Rotation'].getfloat('X'),
                            config['Galaxy-2.Rotation'].getfloat('Y'),
                            config['Galaxy-2.Rotation'].getfloat('Z')]]
-    Collision(galaxy1_properties[0], galaxy1_properties[0]).initial_condition_file(pericenter=0,
-                                                                                   orbit=[galaxy1_properties[1],
-                                                                                          galaxy2_properties[1],
-                                                                                          galaxy1_properties[2],
-                                                                                          galaxy2_properties[2]])
+    _collision = Collision(galaxy1_properties[0], galaxy2_properties[0])
+    _collision.do_rotation(0, 'XYZ', galaxy1_properties[3])
+    _collision.do_rotation(1, 'XYZ', galaxy2_properties[3])
+    _collision.initial_condition_file(pericenter=0, orbit=[galaxy1_properties[1],
+                                                           galaxy2_properties[1],
+                                                           galaxy1_properties[2],
+                                                           galaxy2_properties[2]])

@@ -1,5 +1,5 @@
 import argparse
-from iccr import Collision  # Adjust the import based on your package structure
+from iccr import Collision
 
 def do_(galaxy1, galaxy2, pericenter):
     a = Collision(galaxy1, galaxy2).initial_condition_file(pericenter=pericenter)
