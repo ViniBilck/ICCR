@@ -30,8 +30,9 @@ def main():
                            config['Galaxy-2.Rotation'].getfloat('Y'),
                            config['Galaxy-2.Rotation'].getfloat('Z')]]
     _collision = Collision(galaxy1_properties[0], galaxy2_properties[0])
-    _collision.do_rotation(0, 'XYZ', galaxy1_properties[3])
-    _collision.do_rotation(1, 'XYZ', galaxy2_properties[3])
+    #_collision.do_rotation(0, 'XYZ', galaxy1_properties[3])
+    #_collision.do_rotation(1, 'XYZ', galaxy2_properties[3])
+    _collision.create_file()
     _collision.initial_condition_file(pericenter=0, orbit=[galaxy1_properties[1],
                                                            galaxy2_properties[1],
                                                            galaxy1_properties[2],
